@@ -16,7 +16,7 @@ export default defineConfig({
   reporter: [
     ['list'],
     ['html'],
-    ['@aergonaut/playwright-opentelemetry-reporter']
+    ['./otel-reporter']
   ],
   testDir: './tests',
   /* Run tests in files in parallel */
