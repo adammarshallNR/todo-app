@@ -127,6 +127,12 @@ class OtelReporter implements Reporter {
 
   async onEnd() {
     this.suiteSpan?.end();
+    // Force flush here so the suite span is exported before sdk.shutdown() closes
+    // the processor — without this, test spans arrive at New Relic before their parent
+    const provider = trace.getTracerProvider();
+    if (typeof (provider as any).forceFlush === 'function') {
+      await (provider as any).forceFlush();
+    }
   }
 
   printsToStdio() {
