@@ -37,6 +37,9 @@
     ]
   },
   "devDependencies": {
+    "@aergonaut/playwright-opentelemetry-reporter": "^0.2.0",
+    "@opentelemetry/exporter-trace-otlp-http": "^0.214.0",
+    "@opentelemetry/sdk-node": "^0.214.0",
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.5.2",
     "serve": "^14.2.6",
