@@ -40,6 +40,6 @@
     "@playwright/test": "^1.59.1",
     "@types/node": "^25.5.2",
     "serve": "^14.2.6",
-    "typescript": "^6.0.2"
+    "typescript": "^4.9.5"
   }
 }
