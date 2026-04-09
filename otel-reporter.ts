@@ -13,6 +13,7 @@ import {
   SpanKind,
   ROOT_CONTEXT,
   type Span,
+  type Tracer,
 } from '@opentelemetry/api';
 import { W3CTraceContextPropagator } from '@opentelemetry/core';
 import {
@@ -24,7 +25,6 @@ import {
   ATTR_CODE_COLUMN,
 } from '@opentelemetry/semantic-conventions/incubating';
 
-const tracer = trace.getTracer('playwright-e2e');
 const propagator = new W3CTraceContextPropagator();
 
 function getParentContext() {
@@ -40,25 +40,29 @@ function getParentContext() {
 
 class OtelReporter implements Reporter {
   private config!: FullConfig;
+  private tracer!: Tracer;
   private suiteSpan: Span | null = null;
+  private suiteCtx = ROOT_CONTEXT;
   private testSpans: Record<string, Span> = {};
   private stepSpans: Record<string, Span> = {};
 
   onBegin(config: FullConfig, suite: Suite) {
     this.config = config;
+    // Initialise tracer here, after globalSetup has called sdk.start()
+    this.tracer = trace.getTracer('playwright-e2e');
     const parentCtx = getParentContext();
-    this.suiteSpan = tracer.startSpan('playwright-test-suite', {
+    this.suiteSpan = this.tracer.startSpan('playwright-test-suite', {
       kind: SpanKind.INTERNAL,
-      startTime: suite.allTests()[0]?.results[0]?.startTime ?? new Date(),
+      startTime: new Date(),
     }, parentCtx);
+    this.suiteCtx = trace.setSpan(parentCtx, this.suiteSpan);
   }
 
   onTestBegin(test: TestCase, result: TestResult) {
-    const suiteCtx = trace.setSpan(ROOT_CONTEXT, this.suiteSpan!);
-    const testSpan = tracer.startSpan(this.formatTitle(test), {
+    const testSpan = this.tracer.startSpan(this.formatTitle(test), {
       kind: SpanKind.INTERNAL,
       startTime: result.startTime,
-    }, suiteCtx);
+    }, this.suiteCtx);
     this.testSpans[test.id] = testSpan;
   }
 
@@ -94,7 +98,7 @@ class OtelReporter implements Reporter {
     if (!parentSpan) return;
 
     const ctx = trace.setSpan(context.active(), parentSpan);
-    const stepSpan = tracer.startSpan(`Step: ${step.title}`, {
+    const stepSpan = this.tracer.startSpan(`Step: ${step.title}`, {
       startTime: step.startTime,
     }, ctx);
     this.stepSpans[this.stepKey(test, step)] = stepSpan;
