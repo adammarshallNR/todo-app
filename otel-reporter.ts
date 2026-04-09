@@ -71,6 +71,7 @@ class OtelReporter implements Reporter {
     if (!testSpan) return;
 
     const isPassing = result.status === 'skipped' || result.status === test.expectedStatus;
+    const isFlaky = isPassing && result.retry > 0;
     const project = test.parent.project();
     testSpan.setAttributes({
       [ATTR_TEST_CASE_NAME]: this.formatTitle(test),
@@ -80,6 +81,8 @@ class OtelReporter implements Reporter {
       [ATTR_CODE_LINENO]: test.location.line,
       [ATTR_CODE_COLUMN]: test.location.column,
       'browser.name': project?.name ?? 'unknown',
+      'test.retry': result.retry,
+      'test.flaky': isFlaky,
     });
 
     if (!isPassing) {

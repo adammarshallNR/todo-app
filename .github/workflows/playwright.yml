@@ -23,6 +23,7 @@ jobs:
       run: npx playwright test
       env:
         NEW_RELIC_LICENSE_KEY: ${{ secrets.NEW_RELIC_LICENSE_KEY }}
+        SQUAD_OWNER: ${{ secrets.SQUAD_OWNER }}
     - uses: actions/upload-artifact@v4
       if: ${{ !cancelled() }}
       with:
