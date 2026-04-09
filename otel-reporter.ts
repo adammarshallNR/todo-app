@@ -71,6 +71,7 @@ class OtelReporter implements Reporter {
     if (!testSpan) return;
 
     const isPassing = result.status === 'skipped' || result.status === test.expectedStatus;
+    const project = test.parent.project();
     testSpan.setAttributes({
       [ATTR_TEST_CASE_NAME]: this.formatTitle(test),
       [ATTR_TEST_CASE_RESULT_STATUS]: isPassing ? 'pass' : 'fail',
@@ -78,6 +79,7 @@ class OtelReporter implements Reporter {
       [ATTR_CODE_FILEPATH]: test.location.file,
       [ATTR_CODE_LINENO]: test.location.line,
       [ATTR_CODE_COLUMN]: test.location.column,
+      'browser.name': project?.name ?? 'unknown',
     });
 
     if (!isPassing) {

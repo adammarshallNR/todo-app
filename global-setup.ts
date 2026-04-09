@@ -1,6 +1,14 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
 import { resourceFromAttributes } from '@opentelemetry/resources';
+import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
+
+const exporter = new OTLPTraceExporter({
+  url: 'https://otlp.nr-data.net/v1/traces', // Use otlp.eu01.nr-data.net for EU accounts
+  headers: {
+    'api-key': process.env.NEW_RELIC_LICENSE_KEY
+  }
+});
 
 const sdk = new NodeSDK({
   resource: resourceFromAttributes({
@@ -11,12 +19,12 @@ const sdk = new NodeSDK({
     'env.tag': process.env.ENV_TAG || 'dev', // dev, tst, pr, pprd
     'squad.owner': process.env.SQUAD_OWNER || 'unassigned'
   }),
-  traceExporter: new OTLPTraceExporter({
-    url: 'https://otlp.nr-data.net/v1/traces', // Use otlp.eu01.nr-data.net for EU accounts
-    headers: {
-      'api-key': process.env.NEW_RELIC_LICENSE_KEY
-    }
-  })
+  // Disable auto-export so all spans are held until sdk.shutdown() flushes them
+  // together — prevents test spans arriving at New Relic before the suite span
+  spanProcessors: [new BatchSpanProcessor(exporter, {
+    scheduledDelayMillis: 60 * 60 * 1000, // effectively never auto-export
+    maxExportBatchSize: 10000,
+  })]
 });
 
 export default async function globalSetup() {
