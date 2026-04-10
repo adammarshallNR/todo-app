@@ -1,70 +1,130 @@
-# Getting Started with Create React App
+# Playwright OpenTelemetry Reference
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A reference implementation for instrumenting Playwright E2E tests with OpenTelemetry and shipping trace data to New Relic via GitHub Actions.
 
-## Available Scripts
+The application under test is a simple React todo app — the app itself is not the point. The focus is on the observability wiring around the test suite.
 
-In the project directory, you can run:
+---
 
-### `npm start`
+## What this demonstrates
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+- A custom Playwright [Reporter](https://playwright.dev/docs/api-class-reporter) that creates OpenTelemetry spans for every test and step
+- A `globalSetup` file that initialises the OTel SDK before tests run and flushes it cleanly after
+- A GitHub Actions workflow that builds, deploys, and runs the test suite in a single pipeline so all jobs appear as one trace group in New Relic
+- The `newrelic-experimental/gha-new-relic-exporter` action that enriches those traces with GitHub Actions metadata
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+---
 
-### `npm test`
+## Trace structure
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+```
+playwright-test-suite  (root span — one per run)
+└── <suite> > <test>   (one span per test)
+    └── Step: ...      (one span per Playwright step)
+```
 
-### `npm run build`
+Spans carry semantic attributes from the [OpenTelemetry semantic conventions](https://opentelemetry.io/docs/specs/semconv/):
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+| Attribute | Value |
+|---|---|
+| `test.case.name` | `<suite> > <test title>` |
+| `test.case.result.status` | `pass` / `fail` |
+| `test.suite.name` | suite title |
+| `code.filepath` | path to the test file |
+| `code.lineno` / `code.column` | test location |
+| `browser.name` | chromium / firefox / webkit |
+| `test.retry` | retry attempt number |
+| `test.flaky` | `true` if passed on a retry |
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+W3C Trace Context (`TRACEPARENT` env var) is supported for linking runs to an upstream pipeline span.
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## Key files
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+| File | Purpose |
+|---|---|
+| `global-setup.ts` | Starts the OTel SDK before all tests; shuts it down and flushes spans afterwards |
+| `otel-reporter.ts` | Custom Playwright reporter — creates suite/test/step spans |
+| `playwright.config.ts` | Wires up `globalSetup` and the custom reporter |
+| `.github/workflows/main.yaml` | CI pipeline: build → upload to S3 → run Playwright tests |
+| `.github/workflows/new-relic-exporter.yaml` | Exports GitHub Actions run metadata to New Relic |
+| `tests/basic.test.ts` | Example test suite (includes intentional failures to validate error reporting) |
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+## GitHub Actions pipeline
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+The workflow in `main.yaml` has two jobs:
 
-## Learn More
+```
+build  ──►  test
+```
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+**`build`** — installs dependencies, builds the React app, syncs to S3, and uploads the build as a GitHub artifact.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+**`test`** — downloads the build artifact, installs Playwright browsers, runs the test suite, and uploads the HTML report.
 
-### Code Splitting
+Both jobs run under the same workflow name, so `new-relic-exporter.yaml` (which fires once per completed workflow) produces a single trace group in New Relic rather than one per job.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+---
 
-### Analyzing the Bundle Size
+## Required GitHub secrets
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+| Secret | Used by |
+|---|---|
+| `NEW_RELIC_LICENSE_KEY` | OTel exporter in `global-setup.ts` |
+| `SQUAD_OWNER` | Attached as `squad.owner` resource attribute |
+| `AWS_S3_BUCKET` | S3 sync in the build job |
+| `AWS_ACCESS_KEY_ID` | S3 authentication |
+| `AWS_SECRET_ACCESS_KEY` | S3 authentication |
 
-### Making a Progressive Web App
+The New Relic OTLP endpoint is set to the EU region (`otlp.eu01.nr-data.net`). Change it to `otlp.nr-data.net` in `global-setup.ts` for US accounts.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+---
 
-### Advanced Configuration
+## Adapting for your own project
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+1. **Copy the three observability files** into your repo:
+   - `global-setup.ts`
+   - `otel-reporter.ts`
+   - `playwright.config.ts` (or merge the relevant settings)
 
-### Deployment
+2. **Install the dependencies:**
+   ```bash
+   npm install --save-dev \
+     @opentelemetry/sdk-node \
+     @opentelemetry/exporter-trace-otlp-http \
+     @opentelemetry/api
+   ```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+3. **Update `playwright.config.ts`** to point at your own `baseURL` and web server command.
 
-### `npm run build` fails to minify
+4. **Add the GitHub secrets** listed above to your repository.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+5. **Add `new-relic-exporter.yaml`** to your `.github/workflows/` directory as-is — it requires no changes.
+
+6. **Ensure your test job is in the same workflow as your build/deploy jobs** so they all appear under one trace group.
+
+---
+
+## Running locally
+
+```bash
+npm install
+npm run build
+npx playwright test
+```
+
+The OTel exporter will no-op if `NEW_RELIC_LICENSE_KEY` is not set — tests will still run and results will appear in the local HTML report (`playwright-report/index.html`).
+
+---
+
+## Intentional test failures
+
+`tests/basic.test.ts` includes two tests that are designed to fail:
+
+- `FAILING — expects wrong title`
+- `FAILING — expects non-existent element`
+
+These exist to verify that failure data flows correctly through to New Relic. The workflow uses `npx playwright test || true` so CI does not block on them.
