@@ -32,3 +32,14 @@ test('toggles a task as completed', async ({ page }) => {
   await checkbox.check();
   await expect(checkbox).toBeChecked();
 });
+
+// Intentionally failing tests to verify New Relic receives data on failure
+test('FAILING — expects wrong title', async ({ page }) => {
+  await page.goto('/');
+  await expect(page).toHaveTitle(/Wrong Title/);
+});
+
+test('FAILING — expects non-existent element', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.getByText('This text does not exist')).toBeVisible({ timeout: 3000 });
+});
