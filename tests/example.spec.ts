@@ -21,7 +21,7 @@ test('adds a new task', async ({ page }) => {
 test('deletes a task', async ({ page }) => {
   await page.goto('/');
   const item = page.getByText('Doctor Appointment');
-  await item.locator('..').getByRole('button', { name: 'X' }).click();
+  await item.locator('..').getByRole('button', { name: '✕' }).click();
   await expect(page.getByText('Doctor Appointment')).not.toBeVisible();
 });
 
