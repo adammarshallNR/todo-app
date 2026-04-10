@@ -4,7 +4,9 @@ import { resourceFromAttributes } from '@opentelemetry/resources';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 
 const exporter = new OTLPTraceExporter({
-  url: 'https://otlp.eu01.nr-data.net/v1/traces', //Use otlp.nr-data.net for US accounts
+  // EU accounts: https://otlp.eu01.nr-data.net/v1/traces
+  // US accounts: https://otlp.nr-data.net/v1/traces
+  url: process.env.NEW_RELIC_OTLP_ENDPOINT || 'https://otlp.eu01.nr-data.net/v1/traces',
   headers: {
     'api-key': process.env.NEW_RELIC_LICENSE_KEY
   }
