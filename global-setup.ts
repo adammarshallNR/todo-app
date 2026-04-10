@@ -12,7 +12,7 @@ const exporter = new OTLPTraceExporter({
 
 const sdk = new NodeSDK({
   resource: resourceFromAttributes({
-    'service.name': process.env.SERVICE_NAME || 'playwright-e2e',
+    'service.name': process.env.GITHUB_REPOSITORY || process.env.SERVICE_NAME || 'playwright-e2e',
     'ci.pipeline': process.env.GITHUB_WORKFLOW,
     'ci.job.id': process.env.GITHUB_RUN_ID,
     'ci.commit': process.env.GITHUB_SHA,

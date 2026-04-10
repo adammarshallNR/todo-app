@@ -59,7 +59,7 @@ class OtelReporter implements Reporter {
   }
 
   onTestBegin(test: TestCase, result: TestResult) {
-    const testSpan = this.tracer.startSpan(this.formatTitle(test), {
+    const testSpan = this.tracer.startSpan(this.suiteName(test), {
       kind: SpanKind.INTERNAL,
       startTime: result.startTime,
     }, this.suiteCtx);
@@ -142,8 +142,12 @@ class OtelReporter implements Reporter {
     return false;
   }
 
+  private suiteName(test: TestCase) {
+    return test.parent.title.replace(/\.[^.]+$/, '');
+  }
+
   private formatTitle(test: TestCase) {
-    return `${test.parent.title} > ${test.title}`;
+    return `${this.suiteName(test)} > ${test.title}`;
   }
 
   private stepKey(test: TestCase, step: TestStep) {

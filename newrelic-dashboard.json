@@ -15,7 +15,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) AS 'Total Tests' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL SINCE 1 week ago"
+                "query": "SELECT count(*) AS 'Total Tests' FROM Span WHERE test.case.result.status IS NOT NULL SINCE 1 week ago"
               }
             ]
           }
@@ -28,7 +28,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) AS 'Passing' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status = 'pass' SINCE 1 week ago"
+                "query": "SELECT count(*) AS 'Passing' FROM Span WHERE test.case.result.status = 'pass' SINCE 1 week ago"
               }
             ],
             "thresholds": [
@@ -44,7 +44,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) AS 'Failing' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status = 'fail' SINCE 1 week ago"
+                "query": "SELECT count(*) AS 'Failing' FROM Span WHERE test.case.result.status = 'fail' SINCE 1 week ago"
               }
             ],
             "thresholds": [
@@ -60,7 +60,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'fail') AS 'Failure Rate %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL SINCE 1 week ago"
+                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'fail') AS 'Failure Rate %' FROM Span WHERE test.case.result.status IS NOT NULL SINCE 1 week ago"
               }
             ],
             "thresholds": [
@@ -77,7 +77,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass Rate %', percentage(count(*), WHERE test.case.result.status = 'fail') AS 'Fail Rate %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL SINCE 4 weeks ago TIMESERIES 1 day"
+                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass Rate %', percentage(count(*), WHERE test.case.result.status = 'fail') AS 'Fail Rate %' FROM Span WHERE test.case.result.status IS NOT NULL SINCE 4 weeks ago TIMESERIES 1 day"
               }
             ]
           }
@@ -90,7 +90,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL FACET test.case.result.status SINCE 1 week ago"
+                "query": "SELECT count(*) FROM Span WHERE test.case.result.status IS NOT NULL FACET test.case.result.status SINCE 1 week ago"
               }
             ]
           }
@@ -103,7 +103,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL FACET env.tag, test.case.result.status SINCE 1 week ago"
+                "query": "SELECT count(*) FROM Span WHERE test.case.result.status IS NOT NULL FACET env.tag, test.case.result.status SINCE 1 week ago"
               }
             ]
           }
@@ -116,7 +116,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL FACET browser.name, test.case.result.status SINCE 1 week ago"
+                "query": "SELECT count(*) FROM Span WHERE test.case.result.status IS NOT NULL FACET browser.name, test.case.result.status SINCE 1 week ago"
               }
             ]
           }
@@ -135,7 +135,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT average(duration.ms) / 1000 AS 'Avg Duration (s)' FROM Span WHERE service.name = 'playwright-e2e' AND name = 'playwright-test-suite' FACET env.tag SINCE 4 weeks ago TIMESERIES 1 day"
+                "query": "SELECT average(duration.ms) / 1000 AS 'Avg Duration (s)' FROM Span WHERE name = 'playwright-test-suite' FACET env.tag SINCE 4 weeks ago TIMESERIES 1 day"
               }
             ]
           }
@@ -148,7 +148,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT latest(duration.ms) / 1000 AS 'Last Run (s)', average(duration.ms) / 1000 AS 'Avg (s)', max(duration.ms) / 1000 AS 'Max (s)' FROM Span WHERE service.name = 'playwright-e2e' AND name = 'playwright-test-suite' SINCE 1 week ago"
+                "query": "SELECT latest(duration.ms) / 1000 AS 'Last Run (s)', average(duration.ms) / 1000 AS 'Avg (s)', max(duration.ms) / 1000 AS 'Max (s)' FROM Span WHERE name = 'playwright-test-suite' SINCE 1 week ago"
               }
             ]
           }
@@ -161,7 +161,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT average(duration.ms) AS 'Avg Duration (ms)' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL FACET test.case.name SINCE 1 week ago LIMIT 20"
+                "query": "SELECT average(duration.ms) AS 'Avg Duration (ms)' FROM Span WHERE test.case.result.status IS NOT NULL FACET test.case.name SINCE 1 week ago LIMIT 20"
               }
             ]
           }
@@ -174,7 +174,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT histogram(duration.ms, 10, 20) FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL SINCE 1 week ago"
+                "query": "SELECT histogram(duration.ms, 10, 20) FROM Span WHERE test.case.result.status IS NOT NULL SINCE 1 week ago"
               }
             ]
           }
@@ -193,7 +193,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) AS 'Failures' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status = 'fail' FACET test.case.name SINCE 1 week ago LIMIT 10"
+                "query": "SELECT count(*) AS 'Failures' FROM Span WHERE test.case.result.status = 'fail' FACET test.case.name SINCE 1 week ago LIMIT 10"
               }
             ]
           }
@@ -206,7 +206,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) AS 'Flaky Runs' FROM Span WHERE service.name = 'playwright-e2e' AND test.flaky = true FACET test.case.name SINCE 1 week ago LIMIT 10"
+                "query": "SELECT count(*) AS 'Flaky Runs' FROM Span WHERE test.flaky = true FACET test.case.name SINCE 1 week ago LIMIT 10"
               }
             ]
           }
@@ -219,7 +219,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.flaky = true) AS 'Flake Rate %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL SINCE 4 weeks ago TIMESERIES 1 day"
+                "query": "SELECT percentage(count(*), WHERE test.flaky = true) AS 'Flake Rate %' FROM Span WHERE test.case.result.status IS NOT NULL SINCE 4 weeks ago TIMESERIES 1 day"
               }
             ]
           }
@@ -232,7 +232,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.flaky = true) AS 'Flake Rate %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL SINCE 1 week ago"
+                "query": "SELECT percentage(count(*), WHERE test.flaky = true) AS 'Flake Rate %' FROM Span WHERE test.case.result.status IS NOT NULL SINCE 1 week ago"
               }
             ],
             "thresholds": [
@@ -249,7 +249,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT timestamp, test.case.name, env.tag, browser.name, squad.owner, code.filepath, error.message FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status = 'fail' SINCE 1 week ago LIMIT 50"
+                "query": "SELECT timestamp, test.case.name, env.tag, browser.name, squad.owner, code.filepath, error.message FROM Span WHERE test.case.result.status = 'fail' SINCE 1 week ago LIMIT 50"
               }
             ]
           }
@@ -268,7 +268,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL AND env.tag = 'dev' SINCE 4 weeks ago TIMESERIES 1 day"
+                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass %' FROM Span WHERE test.case.result.status IS NOT NULL AND env.tag = 'dev' SINCE 4 weeks ago TIMESERIES 1 day"
               }
             ]
           }
@@ -281,7 +281,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL AND env.tag = 'tst' SINCE 4 weeks ago TIMESERIES 1 day"
+                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass %' FROM Span WHERE test.case.result.status IS NOT NULL AND env.tag = 'tst' SINCE 4 weeks ago TIMESERIES 1 day"
               }
             ]
           }
@@ -294,7 +294,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL AND env.tag = 'pr' SINCE 4 weeks ago TIMESERIES 1 day"
+                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass %' FROM Span WHERE test.case.result.status IS NOT NULL AND env.tag = 'pr' SINCE 4 weeks ago TIMESERIES 1 day"
               }
             ]
           }
@@ -307,7 +307,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL AND env.tag = 'pprd' SINCE 4 weeks ago TIMESERIES 1 day"
+                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass %' FROM Span WHERE test.case.result.status IS NOT NULL AND env.tag = 'pprd' SINCE 4 weeks ago TIMESERIES 1 day"
               }
             ]
           }
@@ -320,7 +320,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'fail') AS 'Failure Rate %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL FACET env.tag SINCE 4 weeks ago TIMESERIES 1 day"
+                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'fail') AS 'Failure Rate %' FROM Span WHERE test.case.result.status IS NOT NULL FACET env.tag SINCE 4 weeks ago TIMESERIES 1 day"
               }
             ]
           }
@@ -339,7 +339,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT count(*) AS 'Failures' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status = 'fail' FACET squad.owner SINCE 1 week ago"
+                "query": "SELECT count(*) AS 'Failures' FROM Span WHERE test.case.result.status = 'fail' FACET squad.owner SINCE 1 week ago"
               }
             ]
           }
@@ -352,7 +352,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass Rate %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL FACET squad.owner SINCE 1 week ago"
+                "query": "SELECT percentage(count(*), WHERE test.case.result.status = 'pass') AS 'Pass Rate %' FROM Span WHERE test.case.result.status IS NOT NULL FACET squad.owner SINCE 1 week ago"
               }
             ]
           }
@@ -365,7 +365,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT percentage(count(*), WHERE test.flaky = true) AS 'Flake Rate %' FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL FACET squad.owner SINCE 1 week ago"
+                "query": "SELECT percentage(count(*), WHERE test.flaky = true) AS 'Flake Rate %' FROM Span WHERE test.case.result.status IS NOT NULL FACET squad.owner SINCE 1 week ago"
               }
             ]
           }
@@ -378,7 +378,7 @@
             "nrqlQueries": [
               {
                 "accountIds": [$accountId],
-                "query": "SELECT timestamp, test.case.name, test.case.result.status, env.tag, browser.name, squad.owner, test.retry, test.flaky, duration.ms FROM Span WHERE service.name = 'playwright-e2e' AND test.case.result.status IS NOT NULL SINCE 1 week ago LIMIT 100"
+                "query": "SELECT timestamp, test.case.name, test.case.result.status, env.tag, browser.name, squad.owner, test.retry, test.flaky, duration.ms FROM Span WHERE test.case.result.status IS NOT NULL SINCE 1 week ago LIMIT 100"
               }
             ]
           }
