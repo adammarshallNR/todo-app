@@ -1,21 +1,17 @@
 import React from 'react';
+
 function TodoItem({ task, deleteTask, toggleCompleted }) {
-function handleChange() {
- toggleCompleted(task.id);
- }
- 
- return (
- <div className="todo-item">
- <input 
- type="checkbox"
- checked={task.completed}
- onChange={handleChange}
- />
-<p>{task.text}</p>
-<button onClick={() => deleteTask(task.id)}>
- X
- </button>
- </div>
- );
+  return (
+    <div className={`todo-item${task.completed ? ' completed' : ''}`}>
+      <input
+        type="checkbox"
+        checked={task.completed}
+        onChange={() => toggleCompleted(task.id)}
+      />
+      <p>{task.text}</p>
+      <button onClick={() => deleteTask(task.id)}>✕</button>
+    </div>
+  );
 }
+
 export default TodoItem;
