@@ -1,6 +1,6 @@
 import { NodeSDK } from '@opentelemetry/sdk-node';
 import { OTLPTraceExporter } from '@opentelemetry/exporter-trace-otlp-http';
-import { resourceFromAttributes } from '@opentelemetry/resources';
+import { Resource } from '@opentelemetry/resources';
 import { BatchSpanProcessor } from '@opentelemetry/sdk-trace-node';
 
 const exporter = new OTLPTraceExporter({
@@ -13,7 +13,7 @@ const exporter = new OTLPTraceExporter({
 });
 
 const sdk = new NodeSDK({
-  resource: resourceFromAttributes({
+  resource: new Resource({
     'service.name': process.env.GITHUB_REPOSITORY || process.env.SERVICE_NAME || 'playwright-e2e',
     'ci.pipeline': process.env.GITHUB_WORKFLOW,
     'ci.job.id': process.env.GITHUB_RUN_ID,

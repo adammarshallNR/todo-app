@@ -1,0 +1,18 @@
+# Copy to terraform.tfvars for non-secret config.
+# Supply secrets exclusively via TF_VAR_* env vars — never commit them.
+#
+# Before running terraform:
+#   export TF_VAR_aws_access_key_id=$AWS_ACCESS_KEY_ID
+#   export TF_VAR_aws_secret_access_key=$AWS_SECRET_ACCESS_KEY
+#   export TF_VAR_aws_session_token=$AWS_SESSION_TOKEN   # if using temporary creds
+#   export TF_VAR_new_relic_license_key="..."
+#   export TF_VAR_squad_owner="my-team"
+#   export GITHUB_TOKEN="ghp_..."
+
+bucket_name = "todo-app-adammarshallnr"   # must be globally unique
+
+# Optional overrides
+# aws_region   = "eu-west-2"
+# github_owner = "adammarshallNR"
+# github_repo  = "todo-app"
+# local_ip     = "1.2.3.4"   # leave unset to auto-detect

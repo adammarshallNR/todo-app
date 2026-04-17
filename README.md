@@ -128,3 +128,11 @@ The OTel exporter will no-op if `NEW_RELIC_LICENSE_KEY` is not set — tests wil
 - `FAILING — expects non-existent element`
 
 These exist to verify that failure data flows correctly through to New Relic. The workflow uses `npx playwright test || true` so CI does not block on them.
+
+---
+
+## License
+
+This project is licensed under the Apache 2.0 License.
+
+>This project also uses source code from third-party libraries. You can find full details on which libraries are used and the terms under which they are licensed in the third-party notices document.

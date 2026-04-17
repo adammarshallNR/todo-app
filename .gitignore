@@ -25,6 +25,13 @@ yarn-error.log*
 # claude
 CLAUDE.md
 
+# Terraform
+terraform/.terraform/
+terraform/.terraform.lock.hcl
+terraform/terraform.tfvars
+terraform/terraform.tfstate
+terraform/terraform.tfstate.backup
+
 # Playwright
 node_modules/
 /test-results/
